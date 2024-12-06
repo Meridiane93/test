@@ -1,0 +1,62 @@
+function calculatePayment() {
+  
+  var amount = document.getElementById("convert_result").innerText; // сумма кредита
+  
+  var interest = document.getElementById("interest").value; // процентная ставка
+  var years = document.getElementById("month").value; // срок погашения
+  
+  var p = ((amount*(interest/12)) / (1 - Math.pow((1+interest/12), -years ))).toFixed(2); // месячный  платёж
+
+  var sum = (p * years).toFixed(2) // полная сумма платежа
+  
+  // Показываем результаты
+  var html = "<h2>Результаты</h2>";
+  html += "<p>Месячный платёж: <span class='sum'>" + p + "</span></p>";
+  html += "<p>Общая сумма: <span class='sum'>" + sum + "</span></p>";
+  
+
+  // Обновляем раздел результатов
+  document.getElementById("results").innerHTML = html;
+}
+
+// Прикрепляем функцию расчета платежа к событию отправки формы
+document.getElementById("loan-form").addEventListener("submit", function (e) {
+  e.preventDefault();
+  calculatePayment();
+});
+    
+    //получение курса валют
+    window.onload = function () {
+        $.getJSON("https://www.cbr-xml-daily.ru/daily_json.js", function(data) { 
+            let s1 = data.Valute.USD.Value; 
+            let s2 = data.Valute.EUR.Value; 
+            let c = {'USD':s1, 'EUR':s2, 'RUB':'1'}; 
+
+        let val = document.getElementById('amount'); // Получаем элемент ввода данных 
+        let currency1 = document.getElementById('cur1'); // данные из 1 селектора
+        let currency2 = document.getElementById('cur2'); // данные из 2 селектора
+        let result = document.getElementById('convert_result'); // конвертация
+        function summ() { 
+            let z = 0;
+            if(currency1.value === currency2.value){ // если валюта равна руб
+                result.innerText = val.value;  
+            } else {
+                if(currency1.value != 'RUB'){ // если валюта  не равна  рублю
+                    z = val.value*c[currency1.value]; 
+                    result.innerHTML = Math.ceil((z/c[currency2.value])*100)/100;
+                } else { 
+                    result.innerHTML = Math.ceil((val.value*c[currency2.value])*100)/100; }}
+        }
+        
+        // вызываем функцию при вводе данных и измененеии в селекторе
+        val.oninput = function () {  summ(); }; 
+        
+        currency1.onchange = function () { summ(); };
+        
+        });
+        
+        // в данном примере конвертация только на Российский рубль
+    }
+    
+
+    
